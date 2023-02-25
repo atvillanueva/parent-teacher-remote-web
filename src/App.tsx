@@ -1,6 +1,15 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
 
-import ImageSelection from "./components/form/image-selection";
+import Form from "./components/form";
 
 const images = [
   {
@@ -33,53 +42,70 @@ const images = [
     img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
     title: "Honey",
   },
-  {
-    id: 7,
-    img: "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6",
-    title: "Basketball",
-  },
-  {
-    id: 8,
-    img: "https://images.unsplash.com/photo-1518756131217-31eb79b20e8f",
-    title: "Fern",
-  },
-  {
-    id: 9,
-    img: "https://images.unsplash.com/photo-1597645587822-e99fa5d45d25",
-    title: "Mushrooms",
-  },
-  {
-    id: 10,
-    img: "https://images.unsplash.com/photo-1567306301408-9b74779a11af",
-    title: "Tomato basil",
-  },
-  {
-    id: 11,
-    img: "https://images.unsplash.com/photo-1471357674240-e1a485acb3e1",
-    title: "Sea star",
-  },
-  {
-    id: 12,
-    img: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6",
-    title: "Bike",
-  },
 ];
 
-function App() {
-  const [selectedImages, setSelectedImages] = useState<number[]>([]);
+const schema = z.object({
+  homeRoomName: z.string().min(1),
+  studentNumber: z.string().min(1),
+  nounIds: z.array(z.number()).min(2),
+});
 
-  const handleChange = (value: number[]) => {
-    setSelectedImages(value);
+function App() {
+  const formMethods = useForm<z.infer<typeof schema>>({
+    defaultValues: {
+      homeRoomName: "",
+      studentNumber: "",
+      nounIds: [],
+    },
+    mode: "all",
+    resolver: zodResolver(schema),
+  });
+
+  const handleSubmit = (values: z.infer<typeof schema>) => {
+    console.log(values);
   };
 
   return (
-    <ImageSelection
-      value={selectedImages}
-      options={images}
-      optionValueKey="id"
-      optionImgSrcKey="img"
-      onChange={handleChange}
-    />
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      minHeight="100vh"
+    >
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, mt: 0, bgcolor: "secondary.main" }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <Box sx={{ mt: 1 }}>
+            <Form {...formMethods} onSubmit={handleSubmit}>
+              <Stack spacing={2}>
+                <Form.Input label="Home Room" name="homeRoomName" />
+                <Form.Input label="Student Number" name="studentNumber" />
+                <Form.ImageSelection
+                  name="nounIds"
+                  options={images}
+                  optionValueKey="id"
+                  optionImgSrcKey="img"
+                />
+                <Button type="submit" fullWidth sx={{ mt: 3, mb: 2 }}>
+                  Sign In
+                </Button>
+              </Stack>
+            </Form>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 }
 

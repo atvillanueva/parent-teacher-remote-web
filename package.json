@@ -11,11 +11,15 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@hookform/resolvers": "^2.9.11",
+    "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.10",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-use": "^17.4.0"
+    "react-hook-form": "^7.43.2",
+    "react-use": "^17.4.0",
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.191",
