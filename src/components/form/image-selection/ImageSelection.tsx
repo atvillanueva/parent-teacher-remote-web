@@ -22,7 +22,7 @@ type ImageProps = {
 type ImageSelectionProps<TOption extends object, TValue = unknown> = {
   name: string;
   defaultValue?: TValue[];
-  options: TOption[];
+  options?: TOption[];
   optionValueKey: keyof TOption;
   optionImgSrcKey: keyof TOption;
 };
@@ -31,12 +31,14 @@ const ImageButton = styled(ButtonBase, {
   shouldForwardProp: (prop) => prop !== "error" && prop !== "selected",
 })<ImageButtonProps>(({ theme, error, selected }) => ({
   position: "relative",
+  border: "3px solid",
+  borderColor: theme.palette.divider,
   ...(error && {
-    border: "4px solid",
+    border: "3px solid",
     borderColor: theme.palette.error.main,
   }),
   ...(selected && {
-    border: "4px solid",
+    border: "3px solid",
     borderColor: theme.palette.primary.dark,
   }),
 }));
@@ -92,18 +94,14 @@ function ImageSelection<TOption extends object, TValue = unknown>(
         gridTemplateColumns="100px 100px 100px"
         gap={0.5}
       >
-        {options.map((option) => (
+        {options?.map((option) => (
           <ImageButton
             key={getOptionValue(option)}
             error={Boolean(error)}
             selected={field.value.includes(getOptionValue(option))}
             onClick={createClickHandler(getOptionValue(option))}
           >
-            <Image
-              src={`${getOptionImgSrc(
-                option
-              )}?w=164&h=164&fit=crop&auto=format`}
-            />
+            <Image src={`http://localhost:3000/${getOptionImgSrc(option)}`} />
           </ImageButton>
         ))}
       </Box>

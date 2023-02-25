@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,40 +10,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 
+import { useNouns } from "./queries";
+import { useConferenceVerification } from "./mutations";
 import Form from "./components/form";
-
-const images = [
-  {
-    id: 1,
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
-  },
-  {
-    id: 2,
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-  },
-  {
-    id: 3,
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-  },
-  {
-    id: 4,
-    img: "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c",
-    title: "Coffee",
-  },
-  {
-    id: 5,
-    img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
-    title: "Hats",
-  },
-  {
-    id: 6,
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-  },
-];
 
 const schema = z.object({
   homeRoomName: z.string().min(1),
@@ -51,6 +21,11 @@ const schema = z.object({
 });
 
 function App() {
+  const nouns = useNouns();
+  const conferenceVerification = useConferenceVerification();
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const formMethods = useForm<z.infer<typeof schema>>({
     defaultValues: {
       homeRoomName: "",
@@ -62,8 +37,35 @@ function App() {
   });
 
   const handleSubmit = (values: z.infer<typeof schema>) => {
-    console.log(values);
+    conferenceVerification.mutate(values, {
+      onSuccess: () => {
+        alert("Successfully logged in");
+        setIsLoggedIn((prevState) => !prevState);
+      },
+      onError: (error: any) => alert(error?.response?.data?.message),
+    });
   };
+
+  if (conferenceVerification.isSuccess && isLoggedIn) {
+    console.log();
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="100vh"
+        gap={2}
+      >
+        <Typography>
+          Hello Student {conferenceVerification.data.studentNumber}
+        </Typography>
+        <Button onClick={() => setIsLoggedIn((prevState) => !prevState)}>
+          Logout
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -93,11 +95,16 @@ function App() {
                 <Form.Input label="Student Number" name="studentNumber" />
                 <Form.ImageSelection
                   name="nounIds"
-                  options={images}
+                  options={nouns.data}
                   optionValueKey="id"
-                  optionImgSrcKey="img"
+                  optionImgSrcKey="imgSrc"
                 />
-                <Button type="submit" fullWidth sx={{ mt: 3, mb: 2 }}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={conferenceVerification.isLoading}
+                >
                   Sign In
                 </Button>
               </Stack>
