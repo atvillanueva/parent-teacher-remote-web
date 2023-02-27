@@ -39,7 +39,11 @@ function App() {
   });
 
   const handleSubmit = (values: z.infer<typeof schema>) => {
-    conferenceVerification.mutate(values);
+    conferenceVerification.mutate(values, {
+      onSuccess: () => {
+        setIsLoggedIn((prevState) => !prevState);
+      },
+    });
   };
 
   if (conferenceVerification.isSuccess && isLoggedIn) {
