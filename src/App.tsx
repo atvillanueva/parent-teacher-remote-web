@@ -3,12 +3,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
+import { get } from "lodash";
 
 import { useNouns } from "./queries";
 import { useConferenceVerification } from "./mutations";
@@ -37,17 +39,10 @@ function App() {
   });
 
   const handleSubmit = (values: z.infer<typeof schema>) => {
-    conferenceVerification.mutate(values, {
-      onSuccess: () => {
-        alert("Successfully logged in");
-        setIsLoggedIn((prevState) => !prevState);
-      },
-      onError: (error: any) => alert(error?.response?.data?.message),
-    });
+    conferenceVerification.mutate(values);
   };
 
   if (conferenceVerification.isSuccess && isLoggedIn) {
-    console.log();
     return (
       <Box
         display="flex"
@@ -82,7 +77,12 @@ function App() {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, mt: 0, bgcolor: "secondary.main" }}>
+          {conferenceVerification.isError && (
+            <Alert variant="filled" severity="error">
+              {get(conferenceVerification.error, "response.data.message")}
+            </Alert>
+          )}
+          <Avatar sx={{ m: 1, mt: 2, bgcolor: "secondary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
